@@ -171,6 +171,30 @@ adapters.forEach(function (adapter) {
       });
     });
 
+    it('#2858 {binary: true} in get()', function () {
+      var db = new PouchDB(dbs.name);
+      var docs = [binAttDoc, binAttDoc2, pngAttDoc];
+      return db.bulkDocs(docs).then(function () {
+        return PouchDB.utils.Promise.all(docs.map(function(doc) {
+          var attName = Object.keys(doc._attachments)[0];
+          var expected = doc._attachments[attName];
+          return db.get(doc._id, {
+            attachments: true,
+            binary: true
+          }).then(function (savedDoc) {
+            var att = savedDoc._attachments[attName];
+            should.not.exist(att.stub);
+            should.exist(att.digest);
+            att.content_type.should.equal(expected.content_type);
+            att.data.should.not.be.a('string');
+            return testUtils.readBlobPromise(att.data);
+          }).then(function (b64) {
+            testUtils.btoa(b64).should.equal(expected.data);
+          });
+        }));
+      });
+    });
+
     it('Measures length correctly after put()', function () {
       var db = new PouchDB(dbs.name);
       return db.put(binAttDoc).then(function () {

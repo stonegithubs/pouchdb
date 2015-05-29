@@ -235,7 +235,7 @@ db.put({
 The `bulkDocs()` and `post()` APIs also accept attachments in either format.
 
 When you fetch attachments, however, `getAttachment()` will always return Blobs/Buffers, whereas
-`get()`/`allDocs()`/`query()` with `{attachments: true}` will always return base64-encoded strings. 
+`allDocs()`/`changes()`/`query()` with `{attachments: true}` will always return base64-encoded strings. `get()` with `{attachments: true}` normally returns base64-encoded strings, but if you add {binary: true}`, it will return Blobs/Buffers.
 
 Related API documentation
 --------
